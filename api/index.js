@@ -126,4 +126,14 @@ app.get('/post/:id', async(req,res) =>{
     res.json(postDoc);
 });
 
+app.delete('/post/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+      await Post.findByIdAndDelete(id);
+      res.json({ success: true, message: 'Post deleted successfully' });
+    } catch (error) {
+      res.status(500).json({ success: false, error: 'Server error' });
+    }
+  });
+
 app.listen(4000);
