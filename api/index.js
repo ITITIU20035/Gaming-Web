@@ -19,9 +19,9 @@ app.use(express.json());
 app.use(cookieParser());
 app.use('/uploads', express.static(__dirname+'/uploads'));
 
-mongoose.connect('mongodb+srv://datnsh:1412dat5c@cluster0.q4rbogh.mongodb.net/?retryWrites=true&w=majority');
-
-
+mongoose.connect('mongodb+srv://datnsh:1412dat5c@cluster0.q4rbogh.mongodb.net/');
+/* Main: mongodb+srv://datnsh:1412dat5c@cluster0.q4rbogh.mongodb.net/?retryWrites=true&w=majority*/
+/*Sub:mongodb+srv://datnsh:1412Dat5c@cluster0.3pok3yx.mongodb.net/ */
 app.post('/register',async (req,res)=>{
     const {username,password} = req.body;
     try{
@@ -40,7 +40,8 @@ app.post('/login', async (req,res) => {
     const userDoc = await User.findOne({username});
     const passOk = bcrypt.compareSync(password, userDoc.password);
     if(passOk){
-        jwt.sign({username, id:userDoc._id}, secret, {}, (err,token) => {
+        jwt.sign({username,
+             id:userDoc._id}, secret, {}, (err,token) => {
             if(err) throw err;
             res.cookie('token', token).json({
                 id:userDoc._id,
@@ -125,15 +126,14 @@ app.get('/post/:id', async(req,res) =>{
     const postDoc = await Post.findById(id).populate('author',['username']);
     res.json(postDoc);
 });
-
-app.delete('/post/:id', async (req, res) => {
-    try {
-      const { id } = req.params;
-      await Post.findByIdAndDelete(id);
-      res.json({ success: true, message: 'Post deleted successfully' });
-    } catch (error) {
-      res.status(500).json({ success: false, error: 'Server error' });
+app.delete('/post/:id', async (req,res)=>{
+    try{
+        const {id} = req.params;
+        await Post.findByIdAndDelete(id);
+        res.json({success:true,message:'Post deleted successfully'});
+    }catch (error){
+        res.status(500).json({success:false, error:'Server error'});
     }
-  });
+});
 
 app.listen(4000);
